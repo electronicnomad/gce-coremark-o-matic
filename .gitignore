@@ -1,0 +1,17 @@
+results/
+
+coremark-1.01/
+v1.01.tar.gz
+*.log
+
+.DS_Store
+desktop.ini
+*.swp
+*~
+
+.gemini/
+.claude/
+.agents/
+GEMINI.md
+CLAUDE.md
+AGENTS.md
