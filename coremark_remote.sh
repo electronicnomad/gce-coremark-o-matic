@@ -23,7 +23,7 @@ log() { echo "[remote] $*" >&2; }
 
 # --- 빌드 의존성 설치 (gcc/make/wget) ---
 if ! command -v gcc >/dev/null 2>&1 || ! command -v make >/dev/null 2>&1 || ! command -v wget >/dev/null 2>&1; then
-  log "build 의존성 설치 중 (build-essential, wget)..."
+  log "Installing build dependencies (build-essential, wget)..."
   export DEBIAN_FRONTEND=noninteractive
   sudo apt-get -o DPkg::Lock::Timeout=120 update -qq
   sudo apt-get -o DPkg::Lock::Timeout=120 install -y -qq build-essential wget >/dev/null
@@ -32,10 +32,10 @@ fi
 # --- CoreMark v1.01 다운로드 및 압축 해제 ---
 rm -rf "$WORK"; mkdir -p "$WORK"; cd "$WORK"
 if [ -f "/tmp/${SRC_TAR}" ]; then
-  log "전송된 CoreMark v1.01 아카이브 사용..."
+  log "Using uploaded CoreMark v1.01 archive..."
   cp "/tmp/${SRC_TAR}" "$SRC_TAR"
 else
-  log "CoreMark v1.01 다운로드 중..."
+  log "Downloading CoreMark v1.01..."
   wget -q "$SRC_URL" -O "$SRC_TAR"
 fi
 tar xzf "$SRC_TAR"
@@ -77,7 +77,7 @@ run_mode() {
 
   # 3) 검증 및 결과 파싱
   if ! grep -q "Correct operation validated" run1.log; then
-    log "검증 실패 (flags: '${extra_flags}'). run1.log:"; cat run1.log >&2
+    log "Validation failed (flags: '${extra_flags}'). run1.log:"; cat run1.log >&2
     return 1
   fi
   score="$(grep 'CoreMark 1.0' run1.log | head -1 | awk -F: '{print $2}' | awk '{print $1}')"
@@ -87,7 +87,7 @@ run_mode() {
 }
 
 if [ "$MODE" = "both" ] || [ "$MODE" = "st" ]; then
-  log "싱글스레드 측정 중..."
+  log "Running single-thread benchmark..."
   out="$(run_mode "")" || exit 1
   read -r st_score st_time st_iter <<<"$out"
   echo "COREMARK_ST=${st_score}"
@@ -96,7 +96,7 @@ if [ "$MODE" = "both" ] || [ "$MODE" = "st" ]; then
 fi
 
 if [ "$MODE" = "both" ] || [ "$MODE" = "mt" ]; then
-  log "멀티스레드 측정 중 (MULTITHREAD=${NPROC})..."
+  log "Running multi-thread benchmark (MULTITHREAD=${NPROC})..."
   out="$(run_mode "-DMULTITHREAD=${NPROC} -DUSE_PTHREAD")" || exit 1
   read -r mt_score mt_time mt_iter <<<"$out"
   echo "COREMARK_MT=${mt_score}"
@@ -104,4 +104,4 @@ if [ "$MODE" = "both" ] || [ "$MODE" = "mt" ]; then
   echo "COREMARK_ITER_MT=${mt_iter}"
 fi
 
-log "완료."
+log "Done."

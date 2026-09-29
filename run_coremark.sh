@@ -305,7 +305,7 @@ for mt in "${MACHINE_TYPES[@]}"; do
   }
 EOF
 
-  log "[$mt] 결과: status=${R_STATUS} cpu=${R_CPU_PLATFORM:-NA} vcpus=$(na "$R_VCPUS") MT=$(na "$R_MT") ST=$(na "$R_ST")"
+  log "[$mt] Result: status=${R_STATUS} cpu=${R_CPU_PLATFORM:-NA} vcpus=$(na "$R_VCPUS") MT=$(na "$R_MT") ST=$(na "$R_ST")"
 done
 
 echo "" >> "$JSON"
@@ -313,7 +313,7 @@ echo "]" >> "$JSON"
 JSON_CLOSED=true
 
 # ------------------------------------------------------------------ 요약 출력
-log "완료. 결과 파일:"
+log "Benchmark completed. Output files:"
 log "  CSV : ${CSV}"
 log "  JSON: ${JSON}"
 echo
