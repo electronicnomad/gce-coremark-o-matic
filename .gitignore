@@ -1,14 +1,20 @@
+# Benchmark results & logs
 results/
-
-coremark-1.01/
-v1.01.tar.gz
 *.log
 
+# CoreMark artifacts
+coremark-1.01/
+v1.01.tar.gz
+*.gz
+
+# OS and Editor files
 .DS_Store
 desktop.ini
 *.swp
 *~
+*.bak
 
+# AI agent and workspace configurations
 .gemini/
 .claude/
 .agents/

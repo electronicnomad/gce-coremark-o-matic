@@ -25,14 +25,19 @@ log() { echo "[remote] $*" >&2; }
 if ! command -v gcc >/dev/null 2>&1 || ! command -v make >/dev/null 2>&1 || ! command -v wget >/dev/null 2>&1; then
   log "build 의존성 설치 중 (build-essential, wget)..."
   export DEBIAN_FRONTEND=noninteractive
-  sudo apt-get update -qq
-  sudo apt-get install -y -qq build-essential wget >/dev/null
+  sudo apt-get -o DPkg::Lock::Timeout=120 update -qq
+  sudo apt-get -o DPkg::Lock::Timeout=120 install -y -qq build-essential wget >/dev/null
 fi
 
 # --- CoreMark v1.01 다운로드 및 압축 해제 ---
 rm -rf "$WORK"; mkdir -p "$WORK"; cd "$WORK"
-log "CoreMark v1.01 다운로드 중..."
-wget -q "$SRC_URL" -O "$SRC_TAR"
+if [ -f "/tmp/${SRC_TAR}" ]; then
+  log "전송된 CoreMark v1.01 아카이브 사용..."
+  cp "/tmp/${SRC_TAR}" "$SRC_TAR"
+else
+  log "CoreMark v1.01 다운로드 중..."
+  wget -q "$SRC_URL" -O "$SRC_TAR"
+fi
 tar xzf "$SRC_TAR"
 cd "$SRC_DIR"
 
@@ -40,7 +45,13 @@ cd "$SRC_DIR"
 echo 'LFLAGS_END += -lpthread' >> linux64/core_portme.mak
 
 NPROC="$(nproc)"
+ARCH="$(uname -m)"
+CPU_MODEL="$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | sed 's/^[ \t]*//' || true)"
+[ -n "$CPU_MODEL" ] || CPU_MODEL="$(lscpu 2>/dev/null | grep -m1 'Model name:' | cut -d: -f2- | sed 's/^[ \t]*//' || echo "$ARCH")"
+
 echo "NPROC=${NPROC}"
+echo "ARCH=${ARCH}"
+echo "CPU_MODEL=${CPU_MODEL}"
 echo "COREMARK_VERSION=1.01"
 
 # run_mode <extra_xcflags>
